@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>প্রফেশনাল লাইভ স্পোর্টস</title>
+    <!-- PeerJS -->
+    <script src="https://unpkg.com/peerjs@1.4.7/dist/peerjs.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root { --bg: #0f172a; --card: #1e293b; --text: #f8fafc; --primary: #3b82f6; --danger: #ef4444; --accent: #22c55e; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 0; text-align: center; }
+        
+        .container { max-width: 800px; margin: 0 auto; padding: 10px; }
+        
+        /* Video Player Area */
+        .video-container { 
+            position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; 
+            background: #000; border-radius: 12px; margin-bottom: 15px; border: 2px solid #334155;
+        }
+        .video-container iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0; }
+        .no-video { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: #64748b; }
+
+        /* Scoreboard */
+        .scoreboard { background: var(--card); padding: 20px; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.5); }
+        .score-row { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #334155; padding-bottom: 10px; margin-bottom: 10px; }
+        .main-score { font-size: 3rem; font-weight: 800; color: var(--text); line-height: 1; }
+        .wickets { font-size: 1.5rem; color: var(--danger); vertical-align: super; }
+        .details { font-size: 1.1rem; color: #94a3b8; }
+        .status { background: #334155; padding: 5px 10px; border-radius: 20px; font-size: 0.85rem; color: #fbbf24; animation: pulse 2s infinite; }
+        
+        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.6; } 100% { opacity: 1; } }
+
+        /* Viewer Login */
+        .login-box { margin-top: 50px; padding: 20px; background: var(--card); border-radius: 10px; }
+        input { padding: 12px; width: 70%; border-radius: 6px; border: 1px solid #475569; background: #0f172a; color: white; margin-bottom: 10px; }
+        .btn { padding: 12px 20px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; transition: 0.2s; color: white; }
+        .btn-blue { background: var(--primary); width: 100%; }
+        .btn-green { background: var(--accent); }
+        .btn-red { background: var(--danger); }
+        
+        /* Admin Panel */
+        #admin-panel { display: none; text-align: left; background: #111; padding: 15px; border-radius: 10px; border: 1px solid #444; margin-top: 20px; }
+        .control-section { margin-bottom: 20px; padding: 15px; background: #222; border-radius: 8px; }
+        .btn-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-top: 10px; }
+        .btn-control { padding: 15px; font-size: 1.2rem; background: #333; color: white; border: 1px solid #555; border-radius: 5px; cursor: pointer; }
+        .btn-control:active { background: #555; }
+
+        .hidden { display: none !important; }
+        .admin-trigger { position: fixed; bottom: 10px; right: 10px; opacity: 0.3; font-size: 0.8rem; cursor: pointer; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <!-- Header -->
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+        <h2 style="margin:0;"><i class="fas fa-satellite-dish"></i> লাইভ খেলা</h2>
+        <div id="connection-status" style="font-size:0.8rem; color:var(--accent);"></div>
+    </div>
+
+    <!-- Video Area -->
+    <div class="video-container" id="video-wrapper">
+        <div class="no-video" id="video-placeholder">
+            <i class="fas fa-play-circle fa-3x"></i><br>লাইভ লোড হচ্ছে...
+        </div>
+        <!-- Iframe will be injected here -->
+    </div>
+
+    <!-- Scoreboard Area -->
+    <div class="scoreboard" id="scoreboard-ui">
+        <div class="score-row">
+            <div>
+                <span class="main-score" id="score-runs">0</span>
+                <span class="wickets">/<span id="score-wickets">0</span></span>
+            </div>
+            <div style="text-align: right;">
+                <div class="status" id="match-status">অপেক্ষমান</div>
+            </div>
+        </div>
+        <div class="details">
+            ওভার: <span id="score-overs" style="color:var(--primary); font-weight:bold;">0.0</span> 
+            | টার্গেট: <span id="score-target">-</span>
+        </div>
+    </div>
+
+    <!-- Viewer Join Section -->
+    <div class="login-box" id="viewer-login">
+        <h3><i class="fas fa-users"></i> লাইভ দেখুন</h3>
+        <p style="color:#aaa;">এডমিনের দেওয়া ম্যাচ কোডটি দিন:</p>
+        <input type="text" id="join-code" placeholder="যেমন: 4590">
+        <button class="btn btn-blue" onclick="joinStream()">জয়েন করুন</button>
+    </div>
+
+    <!-- Admin Panel -->
+    <div id="admin-panel">
+        <h2 style="color:var(--accent); text-align:center;">এডমিন প্যানেল</h2>
+        
+        <div class="control-section" style="text-align:center;">
+            <p>আপনার ম্যাচ কোড (দর্শকদের দিন):</p>
+            <h1 id="my-admin-id" style="color:var(--primary); letter-spacing: 5px; margin:5px;">...</h1>
+        </div>
+
+        <div class="control-section">
+            <label>🎥 লাইভ ভিডিও লিংক (YouTube/Facebook):</label>
+            <input type="text" id="video-url-input" style="width:100%; box-sizing:border-box;" placeholder="সম্পূর্ণ লিংক পেস্ট করুন">
+            <button class="btn btn-green" style="width:100%; margin-top:5px;" onclick="updateVideoLink()">ভিডিও চালু করুন</button>
+            <small style="color:#fbbf24; display:block; margin-top:5px;">
+                * YouTube: অবশ্যই ভিডিওর Embed অপশন চালু থাকতে হবে।<br>
+                * Facebook: ভিডিও অবশ্যই Public হতে হবে।
+            </small>
+        </div>
+
+        <div class="control-section">
+            <label>🏏 স্কোর কন্ট্রোল:</label>
+            <div class="btn-grid">
+                <button class="btn-control" onclick="updateScore(0)">0</button>
+                <button class="btn-control" onclick="updateScore(1)">1</button>
+                <button class="btn-control" onclick="updateScore(2)">2</button>
+                <button class="btn-control" onclick="updateScore(3)">3</button>
+                <button class="btn-control" onclick="updateScore(4)">4</button>
+                <button class="btn-control" onclick="updateScore(6)">6</button>
+                <button class="btn-control" onclick="updateScore('WD')">WD</button>
+                <button class="btn-control" style="background:var(--danger);" onclick="updateScore('W')">OUT</button>
+            </div>
+            <div style="margin-top:10px;">
+                <input type="text" id="status-text" placeholder="স্ট্যাটাস (যেমন: ইনিংস ব্রেক)" style="width:60%;">
+                <button class="btn btn-blue" style="width:35%;" onclick="updateStatusMsg()">আপডেট</button>
+            </div>
+            <button class="btn btn-control" style="width:100%; margin-top:10px; font-size:1rem;" onclick="undoScore()">ভুল হয়েছে (Undo)</button>
+        </div>
+    </div>
+
+    <div class="admin-trigger" onclick="enableAdmin()">Admin</div>
+</div>
+
+<script>
+    // --- Global Variables ---
+    let peer;
+    let connections = [];
+    let matchState = {
+        runs: 0,
+        wickets: 0,
+        balls: 0,
+        overs: "0.0",
+        target: "-",
+        status: "লাইভ চলছে",
+        videoType: null, // 'yt' or 'fb'
+        videoSrc: null
+    };
+    let scoreHistory = [];
+
+    // --- Admin Setup ---
+    function enableAdmin() {
+        const pass = prompt("এডমিন পাসওয়ার্ড সেট করুন (যেকোনো সংখ্যা):");
+        if(!pass) return;
+
+        document.getElementById('viewer-login').classList.add('hidden');
+        document.getElementById('admin-panel').style.display = 'block';
+
+        const adminId = Math.floor(1000 + Math.random() * 9000).toString();
+        document.getElementById('my-admin-id').innerText = adminId;
+
+        peer = new Peer(adminId);
+        peer.on('open', id => console.log('Hosting on: ' + id));
+        
+        peer.on('connection', conn => {
+            connections.push(conn);
+            conn.on('open', () => conn.send(matchState)); // Send current data on join
+        });
+    }
+
+    function broadcast() {
+        connections.forEach(conn => {
+            if(conn.open) conn.send(matchState);
+        });
+        renderUI(matchState);
+    }
+
+    // --- Scoring Logic ---
+    function updateScore(val) {
+        scoreHistory.push(JSON.parse(JSON.stringify(matchState))); // Save for Undo
+
+        if (val === 'W') { matchState.wickets++; matchState.balls++; }
+        else if (val === 'WD') { matchState.runs++; } // Ball doesn't count
+        else { matchState.runs += val; matchState.balls++; }
+
+        // Calc Overs
+        matchState.overs = Math.floor(matchState.balls / 6) + "." + (matchState.balls % 6);
+        broadcast();
+    }
+
+    function undoScore() {
+        if(scoreHistory.length > 0) {
+            matchState = scoreHistory.pop();
+            broadcast();
+        }
+    }
+
+    function updateStatusMsg() {
+        matchState.status = document.getElementById('status-text').value;
+        broadcast();
+    }
+
+    // --- Video Logic (Powerful Parser) ---
+    function updateVideoLink() {
+        const url = document.getElementById('video-url-input').value.trim();
+        let src = "";
+        let type = "";
+
+        // YouTube Detection
+        const ytMatch = url.match(/(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=))([^&?]+)/);
+        
+        // Facebook Detection
+        const fbMatch = url.includes("facebook.com") || url.includes("fb.watch");
+
+        if (ytMatch && ytMatch[1]) {
+            type = 'yt';
+            src = ytMatch[1];
+        } else if (fbMatch) {
+            type = 'fb';
+            // Facebook needs full URL encoded
+            src = encodeURIComponent(url);
+        } else {
+            alert("সঠিক YouTube বা Facebook ভিডিও লিংক দিন।");
+            return;
+        }
+
+        matchState.videoType = type;
+        matchState.videoSrc = src;
+        broadcast();
+        alert("ভিডিও আপডেট হয়েছে!");
+    }
+
+    // --- Viewer Logic ---
+    function joinStream() {
+        const code = document.getElementById('join-code').value;
+        if(!code) return alert("কোড দিন!");
+
+        document.getElementById('connection-status').innerText = "কানেক্ট হচ্ছে...";
+        
+        peer = new Peer();
+        peer.on('open', () => {
+            const conn = peer.connect(code);
+            conn.on('open', () => {
+                document.getElementById('viewer-login').classList.add('hidden');
+                document.getElementById('connection-status').innerText = "🟢 লাইভ কানেক্টেড";
+            });
+            conn.on('data', data => renderUI(data));
+        });
+    }
+
+    // --- Rendering UI (Handles Video Embeds) ---
+    function renderUI(data) {
+        // Update Score
+        document.getElementById('score-runs').innerText = data.runs;
+        document.getElementById('score-wickets').innerText = data.wickets;
+        document.getElementById('score-overs').innerText = data.overs;
+        document.getElementById('match-status').innerText = data.status;
+        document.getElementById('score-target').innerText = data.target;
+
+        // Update Video (Only if changed)
+        const wrapper = document.getElementById('video-wrapper');
+        const currentIframe = wrapper.querySelector('iframe');
+        
+        if (!data.videoSrc) return;
+
+        // Determine HTML based on type
+        let iframeHTML = "";
+        if (data.videoType === 'yt') {
+            // Check if already playing same video
+            if(currentIframe && currentIframe.src.includes(data.videoSrc)) return;
+            iframeHTML = `<iframe src="https://www.youtube.com/embed/${data.videoSrc}?autoplay=1&mute=0&controls=1&playsinline=1" allowfullscreen allow="autoplay; encrypted-media"></iframe>`;
+        } else if (data.videoType === 'fb') {
+            if(currentIframe && currentIframe.src.includes(data.videoSrc)) return;
+            iframeHTML = `<iframe src="https://www.facebook.com/plugins/video.php?href=${data.videoSrc}&show_text=false&t=0" scrolling="no" allowfullscreen="true" allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share"></iframe>`;
+        }
+
+        if(iframeHTML) {
+            document.getElementById('video-placeholder').style.display = 'none';
+            wrapper.innerHTML = iframeHTML;
+        }
+    }
+</script>
+</body>
+</html>
