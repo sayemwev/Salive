@@ -1,0 +1,1296 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>🪢 গণিত দড়ি টান</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Baloo+Da+2:wght@400;700;800;900&family=Fredoka+One&display=swap');
+
+:root{
+  --red:#FF2D55;--red2:#C0001F;
+  --blue:#007AFF;--blue2:#0040CC;
+  --yellow:#FFD60A;--orange:#FF9500;
+  --green:#34C759;--purple:#AF52DE;
+  --bg:#06061A;--panel:#0F0F2E;--card:#161638;
+  --border:#2A2A5A;--text:#F5F5FF;--muted:#6B6B9A;
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;touch-action:manipulation}
+html,body{height:100%;overflow:hidden}
+body{
+  font-family:'Baloo Da 2',sans-serif;
+  background:var(--bg);color:var(--text);
+  display:flex;flex-direction:column;
+  position:relative;
+}
+
+/* BG */
+.bg-mesh{
+  position:fixed;inset:0;z-index:0;pointer-events:none;
+  background:
+    radial-gradient(ellipse 80% 60% at 15% 5%,rgba(26,0,80,.8),transparent),
+    radial-gradient(ellipse 60% 50% at 85% 95%,rgba(0,26,64,.8),transparent),
+    radial-gradient(ellipse 40% 30% at 50% 50%,rgba(22,22,56,.5),transparent),
+    var(--bg);
+}
+.star-field{position:fixed;inset:0;z-index:0;pointer-events:none}
+.s{position:absolute;border-radius:50%;background:#fff;
+  animation:tw var(--d) ease-in-out infinite var(--del)}
+@keyframes tw{0%,100%{opacity:.1}50%{opacity:.9;transform:scale(1.5)}}
+
+/* ══ SCREENS ══ */
+.scr{
+  position:fixed;inset:0;z-index:10;overflow-y:auto;
+  display:flex;flex-direction:column;align-items:center;
+  padding:16px 16px 24px;
+  opacity:0;pointer-events:none;transition:opacity .25s;
+}
+.scr.on{opacity:1;pointer-events:all}
+#lobbyScr{justify-content:center}
+#gameScr{padding:0;justify-content:flex-start;overflow:hidden}
+
+/* ══ LOBBY ══ */
+.logo{
+  font-family:'Fredoka One',cursive;
+  font-size:clamp(2rem,9vw,3.5rem);
+  background:linear-gradient(135deg,#FFD60A 0%,#FF9500 30%,#FF2D55 60%,#AF52DE 100%);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  filter:drop-shadow(0 0 24px #FF950040);
+  text-align:center;line-height:1.1;
+  animation:logoPulse 3s ease-in-out infinite;
+}
+@keyframes logoPulse{0%,100%{filter:drop-shadow(0 0 24px #FF950040)}50%{filter:drop-shadow(0 0 40px #FF950070)}}
+.logo-sub{color:var(--muted);font-size:.8rem;letter-spacing:3px;text-transform:uppercase;text-align:center;margin:4px 0 20px}
+
+.gcard{
+  background:linear-gradient(160deg,rgba(22,22,56,.95),rgba(15,15,46,.98));
+  border:1.5px solid var(--border);border-radius:22px;
+  padding:20px;width:100%;max-width:400px;
+  box-shadow:0 16px 48px #0009,inset 0 1px 0 rgba(255,255,255,.06);
+  margin-bottom:12px;
+}
+.ctitle{
+  font-family:'Fredoka One',cursive;font-size:1.1rem;
+  color:var(--yellow);margin-bottom:14px;
+  text-align:center;display:flex;align-items:center;justify-content:center;gap:8px;
+}
+
+.rb{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.rb-btn{
+  padding:16px 10px;border:none;border-radius:16px;cursor:pointer;
+  font-family:'Fredoka One',cursive;font-size:1.05rem;
+  display:flex;flex-direction:column;align-items:center;gap:5px;
+  transition:transform .12s;
+}
+.rb-btn:active{transform:scale(.94)}
+.rb-r{background:linear-gradient(135deg,var(--red),var(--red2));color:#fff;box-shadow:0 4px 20px #FF2D5540}
+.rb-b{background:linear-gradient(135deg,var(--blue),var(--blue2));color:#fff;box-shadow:0 4px 20px #007AFF40}
+.rb-btn small{font-family:'Baloo Da 2',sans-serif;font-size:.68rem;opacity:.8;font-weight:700}
+
+.flbl{font-size:.72rem;color:var(--muted);font-weight:800;text-transform:uppercase;letter-spacing:1.5px;margin-bottom:5px}
+.finp{
+  width:100%;padding:12px 14px;margin-bottom:11px;
+  background:rgba(255,255,255,.05);border:1.5px solid var(--border);
+  border-radius:13px;color:var(--text);
+  font-family:'Baloo Da 2',sans-serif;font-size:.95rem;font-weight:700;
+  outline:none;transition:border-color .2s;
+}
+.finp:focus{border-color:var(--blue);box-shadow:0 0 0 3px #007AFF18}
+.finp option{background:#161638}
+
+.fbtn{
+  width:100%;padding:15px;border:none;border-radius:16px;
+  font-family:'Fredoka One',cursive;font-size:1.2rem;
+  cursor:pointer;transition:transform .1s;
+  display:flex;align-items:center;justify-content:center;gap:10px;
+}
+.fbtn:active{transform:scale(.95)}
+.fb-r{background:linear-gradient(135deg,var(--red),var(--red2));color:#fff;box-shadow:0 5px 22px #FF2D5535}
+.fb-b{background:linear-gradient(135deg,var(--blue),var(--blue2));color:#fff;box-shadow:0 5px 22px #007AFF35}
+.fb-g{background:linear-gradient(135deg,var(--green),#1A7A30);color:#fff;box-shadow:0 5px 22px #34C75935}
+.fb-gray{background:rgba(42,42,90,.8);color:var(--muted)}
+
+.code-box{
+  background:rgba(255,214,10,.06);border:2px dashed rgba(255,214,10,.35);
+  border-radius:14px;padding:14px;
+  display:flex;align-items:center;justify-content:space-between;gap:10px;
+  margin-bottom:12px;
+}
+.code-num{
+  font-family:'Fredoka One',cursive;font-size:2.2rem;
+  color:var(--yellow);letter-spacing:8px;flex:1;text-align:center;
+  text-shadow:0 0 16px var(--yellow);
+}
+.copy-b{
+  background:rgba(255,214,10,.12);border:1px solid rgba(255,214,10,.35);
+  border-radius:9px;padding:7px 12px;color:var(--yellow);
+  cursor:pointer;font-weight:800;font-size:.78rem;
+  font-family:'Baloo Da 2',sans-serif;white-space:nowrap;
+}
+.copy-b:active{background:rgba(255,214,10,.25)}
+
+.spill{
+  display:inline-flex;align-items:center;gap:7px;
+  padding:7px 14px;border-radius:20px;font-size:.82rem;font-weight:800;
+  margin-bottom:12px;
+}
+.sp-wait{background:rgba(107,107,154,.12);color:var(--muted);border:1px solid var(--border)}
+.sp-ok{background:rgba(52,199,89,.1);color:var(--green);border:1px solid rgba(52,199,89,.35)}
+.sp-err{background:rgba(255,45,85,.1);color:var(--red);border:1px solid rgba(255,45,85,.35)}
+.bdot{animation:blink 1s infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
+
+.tip{
+  background:rgba(255,255,255,.04);border:1px solid var(--border);
+  border-radius:10px;padding:10px 12px;
+  font-size:.75rem;color:var(--muted);line-height:1.6;text-align:center;
+  margin-top:8px;
+}
+
+/* ══ GAME ══ */
+.g-hdr{
+  width:100%;padding:8px 12px;
+  background:rgba(0,0,0,.5);border-bottom:1px solid var(--border);
+  display:grid;grid-template-columns:1fr auto 1fr;
+  align-items:center;gap:6px;flex-shrink:0;
+}
+.pi{display:flex;align-items:center;gap:7px}
+.pi.r2{flex-direction:row-reverse}
+.pav{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.2rem;flex-shrink:0}
+.pav.rv{background:linear-gradient(135deg,#FF2D55,#900);box-shadow:0 0 10px #FF2D5550}
+.pav.bv{background:linear-gradient(135deg,#007AFF,#003);box-shadow:0 0 10px #007AFF50}
+.pn{font-size:.7rem;color:var(--muted);font-weight:800;line-height:1}
+.ps{font-family:'Fredoka One',cursive;font-size:1.5rem;line-height:1;transition:transform .2s}
+.ps.bmp{animation:sbmp .28s ease}
+@keyframes sbmp{0%,100%{transform:scale(1)}50%{transform:scale(1.45)}}
+
+.tcent{text-align:center}
+.tnum{font-family:'Fredoka One',cursive;font-size:1.9rem;color:var(--yellow);line-height:1;transition:color .3s}
+.tnum.red-t{color:var(--red);animation:tshk .1s infinite}
+@keyframes tshk{0%,100%{transform:translateX(0)}50%{transform:translateX(2px)}}
+.tlbl{font-size:.58rem;color:var(--muted);text-transform:uppercase;letter-spacing:1px}
+
+/* Progress */
+.prog{width:100%;padding:5px 12px;background:rgba(0,0,0,.35);flex-shrink:0}
+.plbls{display:flex;justify-content:space-between;font-size:.62rem;font-weight:800;margin-bottom:3px}
+.ptr{
+  height:16px;background:rgba(255,255,255,.07);
+  border-radius:8px;position:relative;overflow:visible;
+  border:1px solid var(--border);
+}
+.pfill-r{
+  position:absolute;left:0;top:0;bottom:0;
+  background:linear-gradient(90deg,#FF2D55,#FF6B35);
+  border-radius:8px 0 0 8px;
+  transition:width .5s cubic-bezier(.34,1.56,.64,1);width:0%;
+}
+.pfill-b{
+  position:absolute;right:0;top:0;bottom:0;
+  background:linear-gradient(270deg,#007AFF,#5AC8FA);
+  border-radius:0 8px 8px 0;
+  transition:width .5s cubic-bezier(.34,1.56,.64,1);width:0%;
+}
+.pknot{
+  position:absolute;top:50%;left:50%;
+  transform:translate(-50%,-50%);
+  width:22px;height:22px;
+  background:radial-gradient(circle,#FFD60A,#FF9500);
+  border-radius:50%;border:2.5px solid #fff;
+  box-shadow:0 0 14px #FFD60A,0 0 28px #FFD60A40;
+  transition:left .5s cubic-bezier(.34,1.56,.64,1);
+  z-index:5;
+}
+
+/* Arena */
+.arena{
+  flex:1;position:relative;overflow:hidden;
+  min-height:0;
+}
+.arena-bg{
+  position:absolute;inset:0;
+  background:linear-gradient(180deg,#080B1E 0%,#0A1410 100%);
+}
+
+/* Clouds */
+.cloud{
+  position:absolute;border-radius:50px;background:rgba(255,255,255,.04);
+  animation:cloudMove linear infinite;
+}
+@keyframes cloudMove{0%{transform:translateX(-200px)}100%{transform:translateX(calc(100vw + 200px))}}
+
+/* Ground */
+.ground{
+  position:absolute;bottom:0;left:0;right:0;
+  height:52px;
+  background:linear-gradient(180deg,#1A500A 0%,#0A2205 100%);
+  border-top:3px solid #2D8014;
+}
+.g-stripe{
+  position:absolute;top:0;left:0;right:0;height:6px;
+  background:repeating-linear-gradient(90deg,#40901A 0,#40901A 18px,#2D6010 18px,#2D6010 36px);
+  opacity:.7;
+}
+
+/* Mountains */
+.mts{
+  position:absolute;bottom:52px;left:0;right:0;height:90px;
+  overflow:hidden;
+}
+.mts svg{width:100%;height:100%;position:absolute;bottom:0}
+
+/* Center flag */
+.cflag{
+  position:absolute;bottom:52px;left:50%;transform:translateX(-50%);
+  width:3px;height:70px;
+  background:linear-gradient(180deg,#FFD60A,#FF9500);
+  box-shadow:0 0 8px #FFD60A50;
+  z-index:6;
+}
+.cflag::after{
+  content:'★';position:absolute;top:-22px;left:50%;
+  transform:translateX(-50%);color:#FFD60A;font-size:1.3rem;
+  text-shadow:0 0 12px #FFD60A;
+}
+
+/* Win zone */
+.wz{
+  position:absolute;bottom:52px;
+  width:40px;height:75px;
+  border-radius:8px;z-index:5;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  font-size:1.4rem;
+}
+.wz-r{left:3px;background:rgba(255,45,85,.1);border:2px dashed rgba(255,45,85,.4);animation:wzp 2s ease-in-out infinite}
+.wz-b{right:3px;background:rgba(0,122,255,.1);border:2px dashed rgba(0,122,255,.4);animation:wzp 2s ease-in-out infinite .6s}
+@keyframes wzp{0%,100%{opacity:.6}50%{opacity:1}}
+.wz small{font-size:.45rem;font-weight:800;text-align:center;margin-top:2px;line-height:1.3}
+
+/* Rope */
+.rope-layer{
+  position:absolute;bottom:95px;left:0;right:0;height:32px;
+  z-index:7;pointer-events:none;
+}
+.rope-svg{width:100%;height:32px;overflow:visible}
+
+/* Characters */
+.char{
+  position:absolute;bottom:52px;z-index:8;
+  transition:left .55s cubic-bezier(.34,1.56,.64,1);
+}
+#cRed{left:calc(32% - 38px)}
+#cBlue{left:calc(68% - 38px);transform:scaleX(-1)}
+
+.char svg{width:76px;height:96px;filter:drop-shadow(0 4px 8px #0006)}
+
+/* Effort sparks */
+.spark{
+  position:absolute;pointer-events:none;z-index:15;
+  animation:sparkFly .5s ease-out forwards;
+  font-size:.9rem;
+}
+@keyframes sparkFly{0%{opacity:1;transform:translate(0,0) scale(1)}100%{opacity:0;transform:var(--mv) scale(.3)}}
+
+/* ══ MATH PANEL ══ */
+.math-panel{
+  width:100%;flex-shrink:0;
+  background:linear-gradient(180deg,rgba(12,12,36,.98),rgba(8,8,24,1));
+  border-top:1px solid var(--border);
+  padding:8px 12px 12px;
+}
+
+.streak-row{display:flex;align-items:center;justify-content:center;gap:4px;margin-bottom:7px}
+.spip{
+  width:11px;height:11px;border-radius:50%;
+  background:var(--border);transition:all .2s;
+}
+.spip.on{background:var(--yellow);box-shadow:0 0 10px var(--yellow);transform:scale(1.3)}
+.dtag{
+  padding:3px 9px;border-radius:9px;
+  font-size:.62rem;font-weight:800;text-transform:uppercase;letter-spacing:1px;
+  margin-left:7px;
+}
+.de{background:rgba(52,199,89,.15);color:var(--green)}
+.dm{background:rgba(255,214,10,.15);color:var(--yellow)}
+.dh{background:rgba(255,45,85,.15);color:var(--red)}
+
+.q-area{text-align:center;margin-bottom:8px}
+.qlbl{font-size:.62rem;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:3px}
+.qbox{
+  font-family:'Fredoka One',cursive;
+  font-size:clamp(1.8rem,7.5vw,2.6rem);
+  color:#fff;
+  background:linear-gradient(135deg,rgba(20,20,54,1),rgba(24,24,64,1));
+  border:2px solid var(--border);border-radius:18px;
+  padding:8px 22px;display:inline-block;
+  box-shadow:0 0 30px #007AFF18,0 4px 16px #0005;
+}
+
+.adisp{
+  width:100%;padding:11px;
+  background:rgba(255,255,255,.05);
+  border:2px solid var(--border);border-radius:14px;
+  font-family:'Fredoka One',cursive;font-size:1.7rem;
+  color:var(--yellow);text-align:center;
+  min-height:50px;display:flex;align-items:center;justify-content:center;
+  margin-bottom:8px;transition:border-color .18s,background .18s;
+}
+.adisp.w{border-color:var(--red);background:rgba(255,45,85,.1);animation:shk .32s}
+.adisp.ok{border-color:var(--green);background:rgba(52,199,89,.1);animation:pop .22s}
+@keyframes shk{0%,100%{transform:translateX(0)}25%,75%{transform:translateX(-7px)}50%{transform:translateX(7px)}}
+@keyframes pop{0%,100%{transform:scale(1)}50%{transform:scale(1.07)}}
+
+.numpad{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:6px}
+.nb{
+  padding:12px 0;
+  background:rgba(255,255,255,.06);
+  border:1.5px solid var(--border);border-radius:13px;
+  font-family:'Fredoka One',cursive;font-size:1.45rem;color:#fff;
+  cursor:pointer;transition:background .1s,transform .08s;text-align:center;
+}
+.nb:active{transform:scale(.9);background:rgba(255,255,255,.14)}
+
+.arow{display:flex;gap:7px}
+.delb{
+  padding:12px 16px;
+  background:rgba(255,45,85,.1);border:1.5px solid rgba(255,45,85,.3);
+  border-radius:13px;color:var(--red);font-size:1.3rem;cursor:pointer;
+}
+.delb:active{background:rgba(255,45,85,.22);transform:scale(.92)}
+.subb{
+  flex:1;padding:12px;border:none;border-radius:13px;
+  font-family:'Fredoka One',cursive;font-size:1.15rem;
+  background:linear-gradient(135deg,var(--green),#1A7A30);
+  color:#fff;cursor:pointer;box-shadow:0 3px 16px #34C75928;
+  transition:transform .1s;
+}
+.subb:active{transform:scale(.95)}
+
+/* ══ OVERLAYS ══ */
+.ov{
+  position:fixed;inset:0;z-index:100;
+  display:flex;align-items:center;justify-content:center;
+  background:rgba(0,0,0,.75);backdrop-filter:blur(10px);
+  opacity:0;pointer-events:none;transition:opacity .28s;
+}
+.ov.on{opacity:1;pointer-events:all}
+.ocard{
+  background:linear-gradient(145deg,rgba(20,20,56,.98),rgba(12,12,40,.99));
+  border:1.5px solid var(--border);border-radius:26px;
+  padding:32px 24px;text-align:center;
+  max-width:330px;width:90%;
+  box-shadow:0 28px 70px #0009;
+  transform:scale(.82) translateY(20px);transition:transform .3s;
+}
+.ov.on .ocard{transform:scale(1) translateY(0)}
+.oem{font-size:4.5rem;display:block;margin-bottom:10px}
+.otit{font-family:'Fredoka One',cursive;font-size:2.1rem;margin-bottom:5px}
+.osub{color:var(--muted);font-size:.88rem;margin-bottom:18px}
+.oscs{display:flex;gap:20px;justify-content:center;margin-bottom:22px}
+.osc{text-align:center}
+.oscv{font-family:'Fredoka One',cursive;font-size:2.3rem}
+.oscl{font-size:.68rem;color:var(--muted);font-weight:700}
+
+/* Load overlay */
+#ldOv{
+  position:fixed;inset:0;z-index:200;
+  background:var(--bg);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;
+}
+#ldOv.hide{display:none}
+.ldico{font-size:3.5rem;animation:bnc 1s ease-in-out infinite}
+@keyframes bnc{0%,100%{transform:translateY(0)}50%{transform:translateY(-12px)}}
+.ldspin{
+  width:48px;height:48px;border:4px solid rgba(255,255,255,.08);
+  border-top-color:var(--blue);border-radius:50%;
+  animation:spin .65s linear infinite;
+}
+@keyframes spin{to{transform:rotate(360deg)}}
+.ldtxt{font-family:'Fredoka One',cursive;font-size:1.25rem;color:var(--muted)}
+
+/* Flash */
+.fov{position:fixed;inset:0;z-index:99;pointer-events:none;opacity:0}
+.fg{background:radial-gradient(ellipse at center,rgba(52,199,89,.3),transparent 70%);animation:flsh .4s ease}
+.fr{background:radial-gradient(ellipse at center,rgba(255,45,85,.3),transparent 70%);animation:flsh .4s ease}
+@keyframes flsh{0%{opacity:1}100%{opacity:0}}
+
+/* Confetti */
+.conf{
+  position:fixed;pointer-events:none;z-index:155;
+  animation:confFly var(--dur) ease-out forwards;
+  font-size:1.8rem;
+}
+@keyframes confFly{
+  0%{transform:translate(0,0) scale(1) rotate(0deg);opacity:1}
+  100%{transform:translate(var(--dx),var(--dy)) scale(.2) rotate(720deg);opacity:0}
+}
+
+/* Win banner */
+.win-banner{
+  position:fixed;top:0;left:0;right:0;z-index:130;
+  padding:14px;text-align:center;
+  font-family:'Fredoka One',cursive;font-size:1.6rem;
+  transform:translateY(-100%);transition:transform .5s cubic-bezier(.34,1.56,.64,1);
+}
+.win-banner.show{transform:translateY(0)}
+.wb-win{background:linear-gradient(135deg,var(--yellow),var(--orange));color:#111}
+.wb-lose{background:linear-gradient(135deg,#3A3A6A,#2A2A5A);color:#aaa}
+
+</style>
+</head>
+<body>
+
+<div class="bg-mesh"></div>
+<div class="star-field" id="sf"></div>
+
+<!-- ══════ LOBBY ══════ -->
+<div class="scr on" id="lobbyScr">
+  <div class="logo">🪢 গণিত দড়ি টান</div>
+  <div class="logo-sub">Math Tug of War · দুই খেলোয়াড়</div>
+
+  <div class="gcard" id="roleCard">
+    <div class="ctitle">তুমি কে? 🤔</div>
+    <div class="rb">
+      <button class="rb-btn rb-r" onclick="pick('host')">
+        <span style="font-size:2rem">🏠</span>হোস্ট
+        <small>খেলা তৈরি করো</small>
+      </button>
+      <button class="rb-btn rb-b" onclick="pick('guest')">
+        <span style="font-size:2rem">🔗</span>যোগ দাও
+        <small>কোড দিয়ে</small>
+      </button>
+    </div>
+  </div>
+
+  <div class="gcard" id="hostSetup" style="display:none">
+    <div class="ctitle">🏠 হোস্ট সেটআপ</div>
+    <div class="flbl">তোমার নাম</div>
+    <input class="finp" id="hName" placeholder="যেমনঃ রাহুল" maxlength="12">
+    <div class="flbl">অঙ্কের ধরন</div>
+    <select class="finp" id="mType">
+      <option value="mixed">মিশ্র (সব ধরন) ✨</option>
+      <option value="add">যোগ (+)</option>
+      <option value="sub">বিয়োগ (−)</option>
+      <option value="mul">গুণ (×)</option>
+      <option value="div">ভাগ (÷)</option>
+    </select>
+    <div class="flbl">কঠিনতার মাত্রা</div>
+    <select class="finp" id="diff">
+      <option value="easy">সহজ (১–১০)</option>
+      <option value="medium" selected>মাঝারি (১–২০)</option>
+      <option value="hard">কঠিন (১–৫০)</option>
+    </select>
+    <button class="fbtn fb-r" onclick="createRoom()">⚡ রুম তৈরি করো</button>
+  </div>
+
+  <div class="gcard" id="hostWait" style="display:none">
+    <div class="ctitle">📡 তোমার রুম কোড</div>
+    <div class="code-box">
+      <div class="code-num" id="codeDisp">----</div>
+      <button class="copy-b" onclick="copyCode()">📋 কপি</button>
+    </div>
+    <div class="spill sp-wait" id="wPill"><span class="bdot">●</span> বন্ধুর জন্য অপেক্ষা...</div>
+    <div class="tip">📱 এই ৪ সংখ্যার কোডটি বন্ধুর মোবাইলে পাঠাও<br>তারপর বন্ধু "যোগ দাও" বেছে কোড দেবে</div>
+  </div>
+
+  <div class="gcard" id="guestSetup" style="display:none">
+    <div class="ctitle">🔗 খেলায় যোগ দাও</div>
+    <div class="flbl">তোমার নাম</div>
+    <input class="finp" id="gName" placeholder="যেমনঃ সিমা" maxlength="12">
+    <div class="flbl">৪ সংখ্যার রুম কোড</div>
+    <input class="finp" id="gCode" placeholder="0000" maxlength="4"
+      style="font-family:'Fredoka One',cursive;font-size:1.6rem;letter-spacing:8px;text-align:center"
+      oninput="this.value=this.value.replace(/\D/g,'').slice(0,4)"
+      inputmode="numeric">
+    <button class="fbtn fb-b" onclick="joinRoom()">🚀 যোগ দাও</button>
+  </div>
+
+  <div class="gcard" id="errCard" style="display:none;border-color:rgba(255,45,85,.4)">
+    <div style="text-align:center;color:var(--red);font-weight:800;font-size:.95rem" id="errMsg">ত্রুটি</div>
+    <button class="fbtn fb-gray" onclick="resetAll()" style="margin-top:12px">🔄 আবার চেষ্টা</button>
+  </div>
+</div>
+
+<!-- ══════ GAME ══════ -->
+<div class="scr" id="gameScr">
+  <!-- Header -->
+  <div class="g-hdr">
+    <div class="pi">
+      <div class="pav rv">🔴</div>
+      <div><div class="pn" id="rName">P1</div><div class="ps" id="rScore" style="color:var(--red)">0</div></div>
+    </div>
+    <div class="tcent">
+      <div class="tnum" id="tNum">15</div>
+      <div class="tlbl">সেকেন্ড</div>
+    </div>
+    <div class="pi r2">
+      <div class="pav bv">🔵</div>
+      <div style="text-align:right"><div class="pn" id="bName">P2</div><div class="ps" id="bScore" style="color:var(--blue)">0</div></div>
+    </div>
+  </div>
+
+  <!-- Progress -->
+  <div class="prog">
+    <div class="plbls">
+      <span style="color:var(--red)">🔴 ←</span>
+      <span style="color:var(--muted);font-size:.58rem">দড়ির অবস্থান</span>
+      <span style="color:var(--blue)">→ 🔵</span>
+    </div>
+    <div class="ptr">
+      <div class="pfill-r" id="pRed"></div>
+      <div class="pfill-b" id="pBlue"></div>
+      <div class="pknot" id="pKnot"></div>
+    </div>
+  </div>
+
+  <!-- Arena -->
+  <div class="arena" id="arena">
+    <div class="arena-bg"></div>
+
+    <!-- Mountains SVG -->
+    <div class="mts">
+      <svg viewBox="0 0 400 90" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
+        <polygon points="0,90 50,20 100,90" fill="#0D1E10" opacity=".9"/>
+        <polygon points="55,90 120,8 185,90" fill="#0A1812" opacity=".9"/>
+        <polygon points="140,90 220,4 300,90" fill="#0D1E10" opacity=".9"/>
+        <polygon points="240,90 320,14 400,90" fill="#0A1812" opacity=".9"/>
+        <polygon points="320,90 400,22 400,90" fill="#0D1E10" opacity=".9"/>
+        <!-- Snow caps -->
+        <polygon points="50,20 42,38 58,38" fill="rgba(255,255,255,.12)"/>
+        <polygon points="120,8 110,28 130,28" fill="rgba(255,255,255,.12)"/>
+        <polygon points="220,4 210,26 230,26" fill="rgba(255,255,255,.15)"/>
+        <polygon points="320,14 310,34 330,34" fill="rgba(255,255,255,.1)"/>
+      </svg>
+    </div>
+
+    <!-- Win zones -->
+    <div class="wz wz-r">🏆<small style="color:var(--red)">লাল<br>জেতে</small></div>
+    <div class="wz wz-b">🏆<small style="color:var(--blue)">নীল<br>জেতে</small></div>
+
+    <!-- Center flag -->
+    <div class="cflag"></div>
+
+    <!-- Rope -->
+    <div class="rope-layer">
+      <svg class="rope-svg" id="ropeSvg" viewBox="0 0 400 32" preserveAspectRatio="none">
+        <defs>
+          <linearGradient id="rg" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stop-color="#FF2D55"/>
+            <stop offset="45%" stop-color="#B8720A"/>
+            <stop offset="55%" stop-color="#C8820A"/>
+            <stop offset="100%" stop-color="#007AFF"/>
+          </linearGradient>
+          <filter id="rshadow"><feDropShadow dx="0" dy="2" stdDeviation="2" flood-color="#0006"/></filter>
+        </defs>
+        <path id="rp1" stroke="url(#rg)" stroke-width="5" fill="none" stroke-linecap="round" filter="url(#rshadow)"/>
+        <path id="rp2" stroke="rgba(120,70,0,.7)" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+        <path id="rp3" stroke="rgba(240,190,80,.5)" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+        <ellipse id="rKnot" cx="200" cy="16" rx="8" ry="9" fill="#8B4513" stroke="#FFD60A" stroke-width="2.5"/>
+        <ellipse id="rKnot2" cx="200" cy="16" rx="4" ry="4" fill="#FFD60A"/>
+        <ellipse id="rKnot3" cx="200" cy="16" rx="1.5" ry="1.5" fill="#fff" opacity=".7"/>
+      </svg>
+    </div>
+
+    <!-- Characters -->
+    <div class="char" id="cRed">
+      <svg viewBox="0 0 76 96" xmlns="http://www.w3.org/2000/svg">
+        <!-- Shadow -->
+        <ellipse cx="38" cy="94" rx="20" ry="4" fill="#00000050"/>
+        <!-- Legs -->
+        <rect x="23" y="64" width="12" height="22" rx="6" fill="#AA0020"/>
+        <rect x="41" y="64" width="12" height="22" rx="6" fill="#AA0020"/>
+        <!-- Shoes -->
+        <ellipse cx="29" cy="88" rx="11" ry="5" fill="#1A1A1A"/>
+        <ellipse cx="47" cy="88" rx="11" ry="5" fill="#1A1A1A"/>
+        <ellipse cx="29" cy="87" rx="7" ry="2.5" fill="#333"/>
+        <ellipse cx="47" cy="87" rx="7" ry="2.5" fill="#333"/>
+        <!-- Body -->
+        <rect x="19" y="33" width="38" height="34" rx="10" fill="#FF2D55"/>
+        <!-- Shirt details -->
+        <rect x="33" y="33" width="10" height="34" rx="0" fill="rgba(255,255,255,.08)"/>
+        <!-- Belt -->
+        <rect x="19" y="55" width="38" height="7" rx="3.5" fill="#AA0020"/>
+        <rect x="34" y="53" width="8" height="11" rx="2.5" fill="#FFD60A"/>
+        <rect x="36" y="56" width="4" height="2" rx="1" fill="#AA0020"/>
+        <!-- Arms -->
+        <rect x="4" y="34" width="16" height="9" rx="4.5" fill="#FFCD8A"/>
+        <rect x="56" y="34" width="16" height="9" rx="4.5" fill="#FFCD8A"/>
+        <!-- Fists -->
+        <circle cx="5" cy="38" r="7" fill="#FFCD8A"/>
+        <path d="M2 36 Q5 30 8 36" fill="#E8A060" opacity=".5"/>
+        <circle cx="71" cy="38" r="7" fill="#FFCD8A"/>
+        <path d="M68 36 Q71 30 74 36" fill="#E8A060" opacity=".5"/>
+        <!-- Head -->
+        <circle cx="38" cy="20" r="18" fill="#FFCD8A"/>
+        <!-- Ear -->
+        <ellipse cx="20.5" cy="20" rx="3" ry="4.5" fill="#FFCD8A"/>
+        <ellipse cx="55.5" cy="20" rx="3" ry="4.5" fill="#FFCD8A"/>
+        <!-- Hair -->
+        <path d="M20 14 Q22 1 38 1 Q54 1 56 14 Q52 6 38 6 Q24 6 20 14Z" fill="#2A1000"/>
+        <rect x="20" y="3" width="36" height="6" rx="3" fill="#2A1000"/>
+        <!-- Eyes white -->
+        <ellipse cx="31" cy="17" rx="5" ry="5.5" fill="#fff"/>
+        <ellipse cx="45" cy="17" rx="5" ry="5.5" fill="#fff"/>
+        <!-- Irises -->
+        <circle cx="32" cy="18" r="3" fill="#5A3A1A"/>
+        <circle cx="46" cy="18" r="3" fill="#5A3A1A"/>
+        <!-- Pupils -->
+        <circle cx="32.5" cy="18.5" r="1.8" fill="#111"/>
+        <circle cx="46.5" cy="18.5" r="1.8" fill="#111"/>
+        <!-- Eye shine -->
+        <circle cx="33.3" cy="17.5" r=".8" fill="#fff"/>
+        <circle cx="47.3" cy="17.5" r=".8" fill="#fff"/>
+        <!-- Eyebrows determined -->
+        <path d="M27 11 Q31 9 35 11" stroke="#2A1000" stroke-width="2" fill="none" stroke-linecap="round"/>
+        <path d="M41 11 Q45 9 49 11" stroke="#2A1000" stroke-width="2" fill="none" stroke-linecap="round"/>
+        <!-- Big grin -->
+        <path d="M30 27 Q38 34 46 27" stroke="#CC5500" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+        <!-- Teeth -->
+        <rect x="33" y="27" width="10" height="4" rx="2" fill="#fff"/>
+        <!-- Cheeks -->
+        <circle cx="25" cy="23" r="5" fill="#FFB08060" opacity=".7"/>
+        <circle cx="51" cy="23" r="5" fill="#FFB08060" opacity=".7"/>
+        <!-- Badge -->
+        <text x="38" y="51" text-anchor="middle" font-family="Fredoka One,sans-serif" font-size="9" fill="rgba(255,255,255,.9)">P1</text>
+        <!-- Effort drops -->
+        <ellipse cx="16" cy="13" rx="2.5" ry="3.5" fill="#5AC8FA" opacity=".75"/>
+        <ellipse cx="12" cy="18" rx="1.5" ry="2" fill="#5AC8FA" opacity=".5"/>
+      </svg>
+    </div>
+
+    <div class="char" id="cBlue" style="left:calc(68% - 38px);transform:scaleX(-1)">
+      <svg viewBox="0 0 76 96" xmlns="http://www.w3.org/2000/svg">
+        <ellipse cx="38" cy="94" rx="20" ry="4" fill="#00000050"/>
+        <rect x="23" y="64" width="12" height="22" rx="6" fill="#003399"/>
+        <rect x="41" y="64" width="12" height="22" rx="6" fill="#003399"/>
+        <ellipse cx="29" cy="88" rx="11" ry="5" fill="#1A1A1A"/>
+        <ellipse cx="47" cy="88" rx="11" ry="5" fill="#1A1A1A"/>
+        <ellipse cx="29" cy="87" rx="7" ry="2.5" fill="#333"/>
+        <ellipse cx="47" cy="87" rx="7" ry="2.5" fill="#333"/>
+        <rect x="19" y="33" width="38" height="34" rx="10" fill="#007AFF"/>
+        <rect x="33" y="33" width="10" height="34" rx="0" fill="rgba(255,255,255,.08)"/>
+        <rect x="19" y="55" width="38" height="7" rx="3.5" fill="#003399"/>
+        <rect x="34" y="53" width="8" height="11" rx="2.5" fill="#FFD60A"/>
+        <rect x="36" y="56" width="4" height="2" rx="1" fill="#003399"/>
+        <rect x="4" y="34" width="16" height="9" rx="4.5" fill="#FFCD8A"/>
+        <rect x="56" y="34" width="16" height="9" rx="4.5" fill="#FFCD8A"/>
+        <circle cx="5" cy="38" r="7" fill="#FFCD8A"/>
+        <circle cx="71" cy="38" r="7" fill="#FFCD8A"/>
+        <circle cx="38" cy="20" r="18" fill="#FFCD8A"/>
+        <ellipse cx="20.5" cy="20" rx="3" ry="4.5" fill="#FFCD8A"/>
+        <ellipse cx="55.5" cy="20" rx="3" ry="4.5" fill="#FFCD8A"/>
+        <path d="M20 14 Q22 1 38 1 Q54 1 56 14 Q52 6 38 6 Q24 6 20 14Z" fill="#1A0060"/>
+        <rect x="20" y="3" width="36" height="6" rx="3" fill="#1A0060"/>
+        <ellipse cx="31" cy="17" rx="5" ry="5.5" fill="#fff"/>
+        <ellipse cx="45" cy="17" rx="5" ry="5.5" fill="#fff"/>
+        <circle cx="32" cy="18" r="3" fill="#1A3A6A"/>
+        <circle cx="46" cy="18" r="3" fill="#1A3A6A"/>
+        <circle cx="32.5" cy="18.5" r="1.8" fill="#111"/>
+        <circle cx="46.5" cy="18.5" r="1.8" fill="#111"/>
+        <circle cx="33.3" cy="17.5" r=".8" fill="#fff"/>
+        <circle cx="47.3" cy="17.5" r=".8" fill="#fff"/>
+        <path d="M27 11 Q31 9 35 11" stroke="#1A0060" stroke-width="2" fill="none" stroke-linecap="round"/>
+        <path d="M41 11 Q45 9 49 11" stroke="#1A0060" stroke-width="2" fill="none" stroke-linecap="round"/>
+        <path d="M30 27 Q38 34 46 27" stroke="#CC5500" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+        <rect x="33" y="27" width="10" height="4" rx="2" fill="#fff"/>
+        <circle cx="25" cy="23" r="5" fill="#FFB08060" opacity=".7"/>
+        <circle cx="51" cy="23" r="5" fill="#FFB08060" opacity=".7"/>
+        <text x="38" y="51" text-anchor="middle" font-family="Fredoka One,sans-serif" font-size="9" fill="rgba(255,255,255,.9)">P2</text>
+        <ellipse cx="16" cy="13" rx="2.5" ry="3.5" fill="#5AC8FA" opacity=".75"/>
+        <ellipse cx="12" cy="18" rx="1.5" ry="2" fill="#5AC8FA" opacity=".5"/>
+      </svg>
+    </div>
+
+    <!-- Ground -->
+    <div class="ground"><div class="g-stripe"></div></div>
+  </div>
+
+  <!-- Math Panel -->
+  <div class="math-panel">
+    <div class="streak-row">
+      <div class="spip" id="sp1"></div>
+      <div class="spip" id="sp2"></div>
+      <div class="spip" id="sp3"></div>
+      <div class="spip" id="sp4"></div>
+      <div class="spip" id="sp5"></div>
+      <span class="dtag dm" id="dTag">মাঝারি</span>
+    </div>
+
+    <div class="q-area">
+      <div class="qlbl">অঙ্কটি সমাধান করো</div>
+      <div class="qbox" id="qBox">প্রস্তুত!</div>
+    </div>
+
+    <div class="adisp" id="aDisp">_</div>
+
+    <div class="numpad">
+      <button class="nb" onclick="np(7)">৭</button>
+      <button class="nb" onclick="np(8)">৮</button>
+      <button class="nb" onclick="np(9)">৯</button>
+      <button class="nb" onclick="np(4)">৪</button>
+      <button class="nb" onclick="np(5)">৫</button>
+      <button class="nb" onclick="np(6)">৬</button>
+      <button class="nb" onclick="np(1)">১</button>
+      <button class="nb" onclick="np(2)">২</button>
+      <button class="nb" onclick="np(3)">৩</button>
+      <button class="nb" onclick="np(0)" style="grid-column:2">০</button>
+    </div>
+
+    <div class="arow">
+      <button class="delb" onclick="dp()">⌫</button>
+      <button class="subb" onclick="sa()">✓ উত্তর দাও</button>
+    </div>
+  </div>
+</div>
+
+<!-- Result overlay -->
+<div class="ov" id="resOv">
+  <div class="ocard">
+    <span class="oem" id="rEm">🏆</span>
+    <div class="otit" id="rTit">জয়!</div>
+    <div class="osub" id="rSub">অসাধারণ!</div>
+    <div class="oscs">
+      <div class="osc">
+        <div class="oscv" id="rMy" style="color:var(--green)">0</div>
+        <div class="oscl">তোমার সঠিক</div>
+      </div>
+      <div class="osc" style="display:flex;align-items:center;font-size:1.6rem;color:var(--border)">VS</div>
+      <div class="osc">
+        <div class="oscv" id="rOpp" style="color:var(--red)">0</div>
+        <div class="oscl">বিরোধীর সঠিক</div>
+      </div>
+    </div>
+    <button class="fbtn fb-g" onclick="doRestart()" style="margin-bottom:8px">🔄 আবার খেলো</button>
+    <button class="fbtn fb-gray" onclick="goLobby()">🏠 লবিতে ফিরো</button>
+  </div>
+</div>
+
+<!-- Load overlay -->
+<div id="ldOv">
+  <div class="ldico">🪢</div>
+  <div class="ldspin"></div>
+  <div class="ldtxt" id="ldTxt">লোড হচ্ছে...</div>
+</div>
+
+<!-- Win banner -->
+<div class="win-banner" id="winBanner"></div>
+
+<script>
+// ══════════════════════════════════════════════
+// STARS
+(function(){
+  const sf=document.getElementById('sf');
+  for(let i=0;i<70;i++){
+    const s=document.createElement('div');s.className='s';
+    const sz=.8+Math.random()*2.2;
+    s.style.cssText=`width:${sz}px;height:${sz}px;top:${Math.random()*100}%;left:${Math.random()*100}%;--d:${2+Math.random()*4}s;--del:${Math.random()*3}s;opacity:.15`;
+    sf.appendChild(s);
+  }
+})();
+
+// ══════════════════════════════════════════════
+// STATE
+let myRole='', myName='', oppName='';
+let gc={mathType:'mixed',difficulty:'medium'};
+let roomCode='';
+let gameOn=false;
+let myScore=0, oppScore=0;
+let ropePos=50; // 50=center, 0=red-side, 100=blue-side
+// Win: rope pushed to ≤22 (red/host wins) or ≥78 (blue/guest wins)
+const WIN_L=22, WIN_R=78;
+// ROPE MECHANICS:
+// Each correct answer pushes rope 7 units toward opponent
+// So net advantage = (myScore - oppScore) × 7 from center(50)
+// Host pulls rope LEFT, Guest pulls rope RIGHT
+let myStreak=0;
+let curQ=null, curAns='', locked=false;
+let timerSec=15, timerIv=null;
+
+// Peer
+let peer=null, conn=null, peerReady=false;
+
+// ══ HIDE LOAD ══
+function hideLoad(){ document.getElementById('ldOv').classList.add('hide') }
+function showLoad(t){ 
+  document.getElementById('ldTxt').textContent=t||'লোড হচ্ছে...';
+  document.getElementById('ldOv').classList.remove('hide');
+}
+
+// ══ PEERJS ══
+function initPeer(id){
+  const p=id?new Peer(id):new Peer();
+  p.on('error',(e)=>{
+    console.error('peer error',e);
+    hideLoad();
+    showErr('সংযোগ ত্রুটি: '+e.type+'. ইন্টারনেট চেক করো।');
+  });
+  return p;
+}
+
+// ══ LOBBY ══
+window.pick=function(r){
+  myRole=r;
+  document.getElementById('roleCard').style.display='none';
+  document.getElementById(r==='host'?'hostSetup':'guestSetup').style.display='block';
+};
+
+window.createRoom=function(){
+  myName=document.getElementById('hName').value.trim()||'লাল খেলোয়াড়';
+  gc.mathType=document.getElementById('mType').value;
+  gc.difficulty=document.getElementById('diff').value;
+
+  roomCode=String(Math.floor(1000+Math.random()*9000));
+  document.getElementById('codeDisp').textContent=roomCode;
+  document.getElementById('hostSetup').style.display='none';
+  document.getElementById('hostWait').style.display='block';
+
+  showLoad('রুম তৈরি হচ্ছে...');
+
+  try {
+    peer=initPeer('tow-'+roomCode);
+    peer.on('open',()=>{
+      peerReady=true;
+      hideLoad();
+      document.getElementById('wPill').innerHTML='<span class="bdot">●</span> বন্ধুর জন্য অপেক্ষা...';
+    });
+    peer.on('connection',(c)=>{
+      conn=c;
+      conn.on('open',()=>{
+        document.getElementById('wPill').className='spill sp-ok';
+        document.getElementById('wPill').innerHTML='✅ সংযুক্ত! খেলা শুরু হচ্ছে...';
+        setupConn();
+        setTimeout(()=>{
+          const q=genQ();
+          send({t:'start',hn:myName,cfg:gc,q});
+        },800);
+      });
+    });
+  } catch(e){
+    hideLoad();
+    showErr('PeerJS লোড হয়নি। ইন্টারনেট সংযোগ দেখো।');
+  }
+};
+
+window.joinRoom=function(){
+  myName=document.getElementById('gName').value.trim()||'নীল খেলোয়াড়';
+  const code=document.getElementById('gCode').value.trim();
+  if(code.length!==4){showErr('৪ সংখ্যার কোড দাও!');return;}
+  roomCode=code;
+
+  showLoad('সংযোগ করা হচ্ছে...');
+
+  try {
+    peer=initPeer();
+    peer.on('open',()=>{
+      conn=peer.connect('tow-'+code,{reliable:true});
+      conn.on('open',()=>{
+        setupConn();
+        send({t:'joined',gn:myName});
+        hideLoad();
+      });
+      conn.on('error',()=>{hideLoad();showErr('সংযোগ হয়নি। কোড ঠিক আছে?');});
+    });
+  } catch(e){
+    hideLoad();
+    showErr('PeerJS লোড হয়নি। ইন্টারনেট সংযোগ দেখো।');
+  }
+};
+
+function setupConn(){
+  conn.on('data',d=>{
+    const msg=typeof d==='string'?JSON.parse(d):d;
+    handleMsg(msg);
+  });
+  conn.on('close',()=>{
+    if(gameOn){alert('বিরোধী চলে গেছে 😢');goLobby();}
+  });
+}
+
+function send(obj){
+  if(conn&&conn.open) conn.send(JSON.stringify(obj));
+}
+
+function handleMsg(m){
+  switch(m.t){
+    case 'joined':
+      oppName=m.gn;
+      break;
+    case 'start':
+      oppName=m.hn;gc=m.cfg;
+      startGame(m.q);
+      break;
+    case 'score':
+      // Opponent scored
+      oppScore=m.sc;
+      // recalculate rope from scores
+      recalcRope();
+      updateScores();updateProg();bumpScore('blue');
+      confettiOpp();
+      if(!checkWin()) {}
+      break;
+    case 'over':
+      handleGameOver(m.won);
+      break;
+    case 'restart':
+      startGame(m.q);
+      break;
+  }
+}
+
+// ══ WIN LOGIC ══
+// ropePos = 50 + (oppScore - myScore)*7 for host
+// ropePos = 50 + (myScore - oppScore)*7 for guest (blue pulls right)
+function recalcRope(){
+  const diff=myScore-oppScore;
+  if(myRole==='host'){
+    // host=red pulls rope left (decreasing ropePos)
+    ropePos=50-diff*7;
+  } else {
+    // guest=blue pulls rope right (increasing ropePos)  
+    ropePos=50+diff*7;
+  }
+  ropePos=Math.max(0,Math.min(100,ropePos));
+}
+
+// ══ GAME ══
+function startGame(q){
+  gameOn=true;
+  myScore=0;oppScore=0;ropePos=50;myStreak=0;
+  curAns='';locked=false;
+
+  document.getElementById('lobbyScr').classList.remove('on');
+  document.getElementById('gameScr').classList.add('on');
+
+  const amHost=(myRole==='host');
+  document.getElementById('rName').textContent=amHost?myName:oppName;
+  document.getElementById('bName').textContent=amHost?oppName:myName;
+
+  curQ=q||genQ();
+  renderQ();updateProg();updateScores();updateStreak();updateDTag();
+  startTimer();
+}
+
+function startTimer(){
+  clearInterval(timerIv);
+  timerSec={easy:20,medium:15,hard:10}[gc.difficulty]||15;
+  updateTDisp();
+  timerIv=setInterval(()=>{
+    timerSec--;updateTDisp();
+    if(timerSec<=0){clearInterval(timerIv);timeOut();}
+  },1000);
+}
+
+function updateTDisp(){
+  const el=document.getElementById('tNum');
+  el.textContent=timerSec;
+  if(timerSec<=5){el.classList.add('red-t');el.style.color='var(--red)'}
+  else{el.classList.remove('red-t');el.style.color='var(--yellow)'}
+}
+
+function timeOut(){
+  myStreak=0;updateStreak();flashScreen('fr');
+  setTimeout(()=>nextQ(),400);
+}
+
+function genQ(){
+  const diff=gc.difficulty||'medium';
+  const max={easy:10,medium:20,hard:50}[diff]||20;
+  let type=gc.mathType||'mixed';
+  if(type==='mixed'){const ops=['add','sub','mul','div'];type=ops[Math.floor(Math.random()*ops.length)];}
+  let a,b,ans,disp;
+  switch(type){
+    case 'add':a=R(1,max);b=R(1,max);ans=a+b;disp=`${a} + ${b} = ?`;break;
+    case 'sub':a=R(2,max);b=R(1,a);ans=a-b;disp=`${a} − ${b} = ?`;break;
+    case 'mul':a=R(1,Math.min(max,12));b=R(1,Math.min(max,12));ans=a*b;disp=`${a} × ${b} = ?`;break;
+    case 'div':b=R(1,Math.min(max,12));ans=R(1,Math.min(10,max));a=b*ans;disp=`${a} ÷ ${b} = ?`;break;
+  }
+  return{ans,disp};
+}
+function R(a,b){return Math.floor(Math.random()*(b-a+1))+a;}
+
+function renderQ(){
+  document.getElementById('qBox').textContent=curQ.disp;
+  document.getElementById('aDisp').textContent='_';
+  document.getElementById('aDisp').className='adisp';
+  curAns='';locked=false;
+}
+
+function nextQ(){
+  curQ=genQ();
+  renderQ();startTimer();
+}
+
+// ══ INPUT ══
+window.np=function(n){
+  if(locked||!gameOn) return;
+  if(curAns.length>=4) return;
+  curAns+=n;
+  document.getElementById('aDisp').textContent=curAns||'_';
+};
+window.dp=function(){
+  if(locked||!gameOn) return;
+  curAns=curAns.slice(0,-1);
+  document.getElementById('aDisp').textContent=curAns||'_';
+};
+window.sa=function(){
+  if(locked||!curAns||!gameOn) return;
+  if(parseInt(curAns)===curQ.ans) correct(); else wrong();
+};
+
+function correct(){
+  myScore++;myStreak=Math.min(myStreak+1,5);
+  document.getElementById('aDisp').className='adisp ok';
+  flashScreen('fg');
+  spawnSparks(true);
+  bumpScore(myRole==='host'?'red':'blue');
+  updateStreak();
+  recalcRope();
+  send({t:'score',sc:myScore});
+  updateScores();updateProg();
+  if(!checkWin()){
+    locked=true;clearInterval(timerIv);
+    setTimeout(()=>nextQ(),350);
+  }
+}
+
+function wrong(){
+  myStreak=0;updateStreak();
+  document.getElementById('aDisp').className='adisp w';
+  flashScreen('fr');
+  curAns='';
+  setTimeout(()=>{
+    document.getElementById('aDisp').textContent='_';
+    document.getElementById('aDisp').className='adisp';
+  },380);
+}
+
+function confettiOpp(){
+  // small particle burst to show opponent scored
+  const side=myRole==='host'?'right':'left';
+  for(let i=0;i<6;i++){
+    const p=document.createElement('div');p.className='conf';
+    p.textContent=['💙','🔵','⚡','✨'][i%4];
+    const x=side==='right'?(75+Math.random()*20):(5+Math.random()*20);
+    p.style.cssText=`left:${x}vw;top:${60+Math.random()*10}vh;
+      --dur:${.8+Math.random()*.5}s;
+      --dx:${(Math.random()-.5)*80}px;
+      --dy:${-60-Math.random()*80}px;font-size:1.2rem;`;
+    document.body.appendChild(p);setTimeout(()=>p.remove(),1500);
+  }
+}
+
+// ══ WIN ══
+function checkWin(){
+  const hostWins=(ropePos<=WIN_L);
+  const guestWins=(ropePos>=WIN_R);
+  if(!hostWins&&!guestWins) return false;
+
+  gameOn=false;clearInterval(timerIv);
+  const iWon=(myRole==='host'&&hostWins)||(myRole==='guest'&&guestWins);
+
+  // Show win banner
+  const wb=document.getElementById('winBanner');
+  wb.textContent=iWon?'🏆 তুমি জিতেছ! 🏆':'😅 হেরে গেছ!';
+  wb.className='win-banner '+(iWon?'wb-win':'wb-lose')+' show';
+  setTimeout(()=>wb.classList.remove('show'),2500);
+
+  send({t:'over',won:!iWon});
+  setTimeout(()=>showResult(iWon),800);
+  return true;
+}
+
+function handleGameOver(opponentWon){
+  // opponent sent us game over — we lost if they won
+  if(gameOn){
+    gameOn=false;clearInterval(timerIv);
+    // this means opponent won, so we lost
+    const wb=document.getElementById('winBanner');
+    wb.textContent='😅 হেরে গেছ!';
+    wb.className='win-banner wb-lose show';
+    setTimeout(()=>wb.classList.remove('show'),2500);
+    setTimeout(()=>showResult(false),800);
+  }
+}
+
+function showResult(iWon){
+  if(iWon) bigConfetti();
+  document.getElementById('rEm').textContent=iWon?'🏆':'💪';
+  document.getElementById('rTit').textContent=iWon?'জয় হয়েছে! 🎉':'হেরেছ! 😅';
+  document.getElementById('rSub').textContent=iWon
+    ?`বাহ ${myName}! তুমি অসাধারণ চ্যাম্পিয়ন!`
+    :`${oppName} জিতেছে। পরের বার তুমি জিতবে!`;
+  document.getElementById('rMy').textContent=myScore;
+  document.getElementById('rOpp').textContent=oppScore;
+  document.getElementById('resOv').classList.add('on');
+}
+
+window.doRestart=function(){
+  document.getElementById('resOv').classList.remove('on');
+  const q=genQ();
+  if(myRole==='host') send({t:'restart',q});
+  startGame(q);
+};
+
+window.goLobby=function(){
+  document.getElementById('resOv').classList.remove('on');
+  resetAll();
+};
+
+window.resetAll=function(){
+  gameOn=false;clearInterval(timerIv);
+  if(conn) conn.close();
+  if(peer) peer.destroy();
+  peer=null;conn=null;myRole='';roomCode='';
+  document.getElementById('gameScr').classList.remove('on');
+  ['hostSetup','hostWait','guestSetup','errCard'].forEach(id=>{
+    document.getElementById(id).style.display='none';
+  });
+  document.getElementById('roleCard').style.display='block';
+  document.getElementById('lobbyScr').classList.add('on');
+};
+
+// ══ UI ══
+function updateProg(){
+  const k=ropePos;
+  const rFill=Math.max(0,50-ropePos);
+  const bFill=Math.max(0,ropePos-50);
+  document.getElementById('pRed').style.width=rFill+'%';
+  document.getElementById('pBlue').style.width=bFill+'%';
+  document.getElementById('pKnot').style.left=k+'%';
+}
+
+function updateScores(){
+  const ah=(myRole==='host');
+  document.getElementById('rScore').textContent=ah?myScore:oppScore;
+  document.getElementById('bScore').textContent=ah?oppScore:myScore;
+}
+
+function bumpScore(side){
+  const el=document.getElementById(side==='red'?'rScore':'bScore');
+  el.classList.remove('bmp');void el.offsetWidth;el.classList.add('bmp');
+}
+
+function updateStreak(){
+  for(let i=1;i<=5;i++){
+    const p=document.getElementById('sp'+i);
+    p.className='spip'+(i<=myStreak?' on':'');
+  }
+}
+
+function updateDTag(){
+  const t=document.getElementById('dTag');
+  const m={easy:['de','সহজ'],medium:['dm','মাঝারি'],hard:['dh','কঠিন']};
+  const [c,l]=m[gc.difficulty]||m.medium;
+  t.className='dtag '+c;t.textContent=l;
+}
+
+function flashScreen(cls){
+  const el=document.createElement('div');
+  el.className='fov '+cls;
+  document.body.appendChild(el);
+  setTimeout(()=>el.remove(),500);
+}
+
+function spawnSparks(correct){
+  const emojis=correct?['✨','⭐','💥','🌟']:['💦','😤'];
+  const chr=document.getElementById(myRole==='host'?'cRed':'cBlue');
+  const rect=chr.getBoundingClientRect();
+  for(let i=0;i<(correct?8:3);i++){
+    const p=document.createElement('div');p.className='conf';
+    p.textContent=emojis[Math.floor(Math.random()*emojis.length)];
+    p.style.cssText=`left:${rect.left+rect.width/2}px;top:${rect.top}px;
+      --dur:${.6+Math.random()*.6}s;
+      --dx:${(Math.random()-.5)*120}px;
+      --dy:${-60-Math.random()*100}px;
+      font-size:${correct?1.5:.9}rem;`;
+    document.body.appendChild(p);setTimeout(()=>p.remove(),1500);
+  }
+}
+
+function bigConfetti(){
+  const emojis=['🏆','🎉','⭐','🥇','✨','🎊','💫','🌟'];
+  for(let i=0;i<35;i++){
+    setTimeout(()=>{
+      const p=document.createElement('div');p.className='conf';
+      p.textContent=emojis[Math.floor(Math.random()*emojis.length)];
+      const x=5+Math.random()*90;
+      p.style.cssText=`left:${x}vw;top:${10+Math.random()*30}vh;
+        --dur:${1.5+Math.random()*1.2}s;
+        --dx:${(Math.random()-.5)*180}px;
+        --dy:${100+Math.random()*200}px;
+        font-size:${1.5+Math.random()*1.5}rem;`;
+      document.body.appendChild(p);setTimeout(()=>p.remove(),3000);
+    },i*55);
+  }
+}
+
+function showErr(m){
+  hideLoad();
+  ['hostSetup','hostWait','guestSetup'].forEach(id=>document.getElementById(id).style.display='none');
+  document.getElementById('errCard').style.display='block';
+  document.getElementById('errMsg').textContent=m;
+}
+
+window.copyCode=function(){
+  navigator.clipboard.writeText(roomCode).then(()=>{
+    const b=document.querySelector('.copy-b');
+    b.textContent='✅ হয়েছে!';setTimeout(()=>b.textContent='📋 কপি',1500);
+  }).catch(()=>{
+    // Fallback
+    const inp=document.createElement('input');
+    inp.value=roomCode;document.body.appendChild(inp);
+    inp.select();document.execCommand('copy');inp.remove();
+    const b=document.querySelector('.copy-b');
+    b.textContent='✅ হয়েছে!';setTimeout(()=>b.textContent='📋 কপি',1500);
+  });
+};
+
+// ══ ROPE ANIMATION ══
+let rafId;
+function drawRope(){
+  const kx=(ropePos/100)*400;
+  document.getElementById('rKnot').setAttribute('cx',kx);
+  document.getElementById('rKnot2').setAttribute('cx',kx);
+  document.getElementById('rKnot3').setAttribute('cx',kx);
+
+  const t=Date.now()/600;
+  let p1='',p2='',p3='';
+  for(let i=0;i<=400;i+=5){
+    const prog=i/400;
+    const sag=Math.sin(prog*Math.PI)*5;
+    const w1=Math.sin(prog*Math.PI*5+t)*1.2;
+    const w2=Math.sin(prog*Math.PI*7-t*.7)*.7;
+    const y=16+sag+w1+w2;
+    p1+=(i===0?'M':'L')+i+' '+y;
+    p2+=(i===0?'M':'L')+i+' '+(y+2);
+    p3+=(i===0?'M':'L')+i+' '+(y-1.2);
+  }
+  document.getElementById('rp1').setAttribute('d',p1);
+  document.getElementById('rp2').setAttribute('d',p2);
+  document.getElementById('rp3').setAttribute('d',p3);
+
+  // Characters follow rope
+  const rPct=32+(50-ropePos)*.32;
+  const bPct=68+(50-ropePos)*.32;
+  document.getElementById('cRed').style.left=`calc(${rPct}% - 38px)`;
+  document.getElementById('cBlue').style.left=`calc(${bPct}% - 38px)`;
+
+  rafId=requestAnimationFrame(drawRope);
+}
+drawRope();
+
+// Keyboard
+document.addEventListener('keydown',e=>{
+  if(!gameOn) return;
+  if(e.key>='0'&&e.key<='9') np(parseInt(e.key));
+  if(e.key==='Backspace') dp();
+  if(e.key==='Enter'||e.key===' ') sa();
+});
+
+hideLoad();
+</script>
+
+<!-- PeerJS -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/peerjs/1.5.4/peerjs.min.js" 
+  onerror="document.getElementById('ldTxt').textContent='PeerJS লোড হয়নি - ইন্টারনেট দেখো'"></script>
+</body>
+</html>
